@@ -1,0 +1,313 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id             String              @id @default(uuid())
+    username       String
+    email          String              @unique
+    password       String
+    role           String              @default("user")
+    profilePicture String?
+    createdAt      DateTime            @default(now())
+    updatedAt      DateTime            @updatedAt
+    familyFees     FamilyFee[]         @relation("userCreatedFamilyFees")
+    fees           Fee[]               @relation("userCreatedFees")
+    salaries       Salary[]            @relation("userCreatedSalaries")
+    recordedLogs   TeacherAttendance[] @relation("userRecordedTeacherAttendance")
+}
+
+model Student {
+    id                       String                           @id @default(uuid())
+    fullname                 String
+    studentId                String?                          @unique
+    age                      Int?
+    gender                   String?
+    classId                  String?
+    class                    Class?                           @relation(fields: [classId], references: [id])
+    feeTotal                 Float                            @default(0)
+    feePaid                  Float                            @default(0)
+    motherNumber             String
+    fatherNumber             String
+    healthRecords            Health[]
+    examRecords              Exam[]
+    disciplineReports        Discipline[]
+    feeRecords               Fee[]
+    attendanceRecords        AttendanceStudent[]
+    dailyQuranRecords        DailyQuran[]
+    lessonRecordPerformances LessonRecordStudentPerformance[]
+    familyFeeStudents        FamilyFeeStudent[]
+    createdAt                DateTime                         @default(now())
+    updatedAt                DateTime                         @updatedAt
+    halaqa                   Halaqa?                          @relation(fields: [halaqaId], references: [id])
+    halaqaId                 String?
+}
+
+model Teacher {
+    id                 String              @id @default(uuid())
+    name               String
+    email              String              @unique
+    number             String
+    subject            String
+    profilePicture     String?
+    attendance         Int?
+    certificate        String?
+    salaryRecords      Salary[]
+    halaqas            Halaqa[]
+    teacherAttendances TeacherAttendance[]
+    createdAt          DateTime            @default(now())
+    updatedAt          DateTime            @updatedAt
+    exams              Exam[]
+}
+
+model Class {
+    id            String         @id @default(uuid())
+    name          String         @unique
+    level         String
+    students      Student[]
+    attendances   Attendance[]
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt
+    exams         Exam[]
+    fees          Fee[]
+    lessonRecords LessonRecord[]
+    dailyQurans   DailyQuran[]
+}
+
+model Attendance {
+    id        String              @id @default(uuid())
+    class     Class               @relation(fields: [classId], references: [id])
+    classId   String
+    date      DateTime            @default(now())
+    students  AttendanceStudent[]
+    createdAt DateTime            @default(now())
+    updatedAt DateTime            @updatedAt
+}
+
+model AttendanceStudent {
+    id           String     @id @default(uuid())
+    attendance   Attendance @relation(fields: [attendanceId], references: [id])
+    attendanceId String
+    student      Student    @relation(fields: [studentId], references: [id])
+    studentId    String
+    status       String
+}
+
+model Discipline {
+    id        String   @id @default(uuid())
+    student   Student  @relation(fields: [studentId], references: [id])
+    studentId String
+    date      DateTime @default(now())
+    reason    String
+    type      String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Exam {
+    id            String   @id @default(uuid())
+    student       Student  @relation(fields: [studentId], references: [id])
+    studentId     String
+    class         Class    @relation(fields: [classId], references: [id])
+    classId       String
+    teacher       Teacher  @relation(fields: [teacherId], references: [id])
+    teacherId     String
+    subject       Subject  @relation(fields: [subjectId], references: [id])
+    subjectId     String
+    examType      String
+    date          DateTime
+    obtainedMarks Int
+    totalMarks    Int
+    academicYear  String
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+}
+
+model FamilyFee {
+    id            String             @id @default(uuid())
+    familyName    String
+    totalAmount   Float
+    paidAmount    Float              @default(0)
+    month         Int
+    year          Int
+    paid          Boolean            @default(false)
+    paidDate      DateTime?
+    dueDate       DateTime
+    paymentMethod String             @default("cash")
+    note          String             @default("")
+    createdBy     User               @relation(fields: [createdById], references: [id], name: "userCreatedFamilyFees")
+    createdById   String
+    students      FamilyFeeStudent[]
+    createdAt     DateTime           @default(now())
+    updatedAt     DateTime           @updatedAt
+}
+
+model FamilyFeeStudent {
+    id          String    @id @default(uuid())
+    familyFee   FamilyFee @relation(fields: [familyFeeId], references: [id])
+    familyFeeId String
+    student     Student   @relation(fields: [studentId], references: [id])
+    studentId   String
+    isPaying    Boolean   @default(false)
+}
+
+model Finance {
+    id                String   @id @default(uuid())
+    date              DateTime @default(now())
+    income            Float
+    expenses          Float
+    debt              Float
+    month             Int?
+    year              Int?
+    isAutoGenerated   Boolean  @default(false)
+    paidFeesCount     Int      @default(0)
+    paidSalariesCount Int      @default(0)
+    unpaidFeesCount   Int      @default(0)
+    lastUpdated       DateTime @default(now())
+    createdAt         DateTime @default(now())
+    updatedAt         DateTime @updatedAt
+}
+
+model Fee {
+    id          String    @id @default(uuid())
+    student     Student   @relation(fields: [studentId], references: [id])
+    studentId   String
+    class       Class     @relation(fields: [classId], references: [id])
+    classId     String
+    amount      Float
+    month       Int
+    year        Int
+    paid        Boolean   @default(false)
+    paidDate    DateTime?
+    dueDate     DateTime
+    note        String    @default("")
+    createdBy   User      @relation(fields: [createdById], references: [id], name: "userCreatedFees")
+    createdById String
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+}
+
+model Halaqa {
+    id            String         @id @default(uuid())
+    name          String         @unique
+    description   String         @default("")
+    teacher       Teacher?       @relation(fields: [teacherId], references: [id])
+    teacherId     String?
+    startingSurah String         @default("")
+    taxdiid       String         @default("")
+    students      Student[]
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt
+    lessonRecords LessonRecord[]
+}
+
+model Health {
+    id        String   @id @default(uuid())
+    student   Student  @relation(fields: [studentId], references: [id])
+    studentId String
+    date      DateTime @default(now())
+    condition String
+    treated   Boolean
+    note      String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model LessonRecord {
+    id                   String                           @id @default(uuid())
+    type                 String
+    date                 DateTime                         @default(now())
+    class                Class?                           @relation(fields: [classId], references: [id])
+    classId              String?
+    halaqa               Halaqa?                          @relation(fields: [halaqaId], references: [id])
+    halaqaId             String?
+    quranDailyLessonHint String                           @default("")
+    quranCurrentSurah    String                           @default("")
+    quranTaxdiid         String                           @default("")
+    quranStudentStatus   String                           @default("")
+    quranNotes           String                           @default("")
+    subciStartingSurah   String                           @default("")
+    subciTaxdiid         String                           @default("")
+    subciNotes           String                           @default("")
+    studentPerformances  LessonRecordStudentPerformance[]
+    createdAt            DateTime                         @default(now())
+    updatedAt            DateTime                         @updatedAt
+}
+
+model LessonRecordStudentPerformance {
+    id              String       @id @default(uuid())
+    lessonRecord    LessonRecord @relation(fields: [lessonRecordId], references: [id])
+    lessonRecordId  String
+    student         Student      @relation(fields: [studentId], references: [id])
+    studentId       String
+    versesTaken     String       @default("")
+    statusScore     Int          @default(0)
+    dailyLessonHint String       @default("")
+    currentSurah    String       @default("")
+    taxdiid         String       @default("")
+    studentStatus   String       @default("")
+    notes           String       @default("")
+}
+
+model Salary {
+    id          String    @id @default(uuid())
+    teacher     Teacher   @relation(fields: [teacherId], references: [id])
+    teacherId   String
+    amount      Float
+    month       Int
+    year        Int
+    paid        Boolean   @default(false)
+    paidDate    DateTime?
+    bonus       Float     @default(0)
+    deductions  Float     @default(0)
+    totalAmount Float
+    note        String    @default("")
+    createdBy   User      @relation(fields: [createdById], references: [id], name: "userCreatedSalaries")
+    createdById String
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+}
+
+model Subject {
+    id        String   @id @default(uuid())
+    name      String   @unique
+    code      String?
+    exams     Exam[]
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model DailyQuran {
+    id           String   @id @default(uuid())
+    student      Student  @relation(fields: [studentId], references: [id])
+    studentId    String
+    status       String
+    date         DateTime @default(now())
+    class        Class    @relation(fields: [classId], references: [id])
+    classId      String
+    currentSurah String   @default("")
+    taxdiid      String   @default("")
+    notes        String   @default("")
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+}
+
+model TeacherAttendance {
+    id           String    @id @default(uuid())
+    teacher      Teacher   @relation(fields: [teacherId], references: [id])
+    teacherId    String
+    date         DateTime  @default(now())
+    status       String
+    checkIn      DateTime?
+    checkOut     DateTime?
+    notes        String?
+    recordedBy   User      @relation(fields: [recordedById], references: [id], name: "userRecordedTeacherAttendance")
+    recordedById String
+    createdAt    DateTime  @default(now())
+    updatedAt    DateTime  @updatedAt
+}

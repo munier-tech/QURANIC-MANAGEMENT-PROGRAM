@@ -1,0 +1,50 @@
+{
+  "name": "quranic-management-system-backend",
+  "version": "1.0.0",
+  "description": "Backend for quranic management system",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "build": "echo 'Backend build complete'",
+    "dev:frontend": "npm run dev --prefix ../frontend",
+    "dev:both": "concurrently \"npm run dev\" \"npm run dev:frontend\"",
+    "vercel-build": "echo 'Backend ready for deployment'",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev --name init"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.12.0",
+    "bcryptjs": "^3.0.2",
+    "cloudinary": "^1.21.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.13",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "express-fileupload": "^1.5.2",
+    "express-rate-limit": "^7.5.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "multer": "^2.0.2",
+    "pg": "^8.11.2",
+    "redis": "^5.6.0",
+    "xlsx": "^0.18.5",
+    "yarn": "^1.22.22"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "nodemon": "^3.1.10",
+    "prisma": "^5.12.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "vercel": {
+    "buildCommand": "npm run vercel-build",
+    "outputDirectory": ".",
+    "installCommand": "npm install"
+  }
+}
