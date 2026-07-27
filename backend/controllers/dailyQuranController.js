@@ -95,7 +95,8 @@ export const createDailyQuran = async (req, res) => {
             id: true,
             fullname: true,
             studentId: true,
-            phone: true
+            motherNumber: true,
+            fatherNumber: true
           }
         },
         class: {
@@ -174,7 +175,8 @@ export const updateDailyQuran = async (req, res) => {
             id: true,
             fullname: true,
             studentId: true,
-            phone: true
+            motherNumber: true,
+            fatherNumber: true
           }
         },
         class: {
@@ -334,7 +336,8 @@ export const getTodaySessions = async (req, res) => {
             id: true,
             fullname: true,
             studentId: true,
-            phone: true
+            motherNumber: true,
+            fatherNumber: true
           }
         },
         class: {
@@ -528,7 +531,8 @@ export const createBulkSessions = async (req, res) => {
                   id: true,
                   fullname: true,
                   studentId: true,
-                  phone: true
+                  motherNumber: true,
+                  fatherNumber: true
                 }
               },
               class: {
@@ -684,7 +688,6 @@ export const getClassSessionsByDate = async (req, res) => {
             id: true,
             fullname: true,
             studentId: true,
-            phone: true,
             fatherNumber: true,
             motherNumber: true
           }
@@ -711,7 +714,6 @@ export const getClassSessionsByDate = async (req, res) => {
         id: true,
         fullname: true,
         studentId: true,
-        phone: true,
         fatherNumber: true,
         motherNumber: true
       },

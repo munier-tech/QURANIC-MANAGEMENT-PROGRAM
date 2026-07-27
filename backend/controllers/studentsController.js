@@ -18,11 +18,14 @@ export const createStudent = async (req, res) => {
   try {
     const { fullname, age, gender, classId, motherNumber, fatherNumber } = req.body;
 
+    // normalize age to integer when provided
+    const parsedAge = (age !== undefined && age !== null && age !== '') ? parseInt(age, 10) : undefined;
+
     if (!fullname || !motherNumber || !fatherNumber || !classId) {
       return res.status(400).json({ message: "Fadlan buuxi dhammaan meelaha looga baahan yahay" });
     }
 
-    if (age < 0) {
+    if (parsedAge !== undefined && (isNaN(parsedAge) || parsedAge < 0)) {
       return res.status(400).json({ message: "Da'da waa khaldan tahay" });
     }
 
@@ -33,10 +36,16 @@ export const createStudent = async (req, res) => {
       return res.status(400).json({ message: "Arday magacan leh hore ayuu u diiwaangashanaa" });
     }
 
+    // verify class exists to avoid foreign key constraint violation
+    const classExists = classId ? await prisma.class.findUnique({ where: { id: classId } }) : null;
+    if (classId && !classExists) {
+      return res.status(400).json({ message: "Fasalka lama helin" });
+    }
+
     const student = await prisma.student.create({
       data: {
         fullname,
-        age,
+        age: parsedAge === undefined ? null : parsedAge,
         gender,
         classId: classId || null,
         motherNumber,
@@ -162,13 +171,16 @@ export const createMultipleStudents = async (req, res) => {
       try {
         const { fullname, age, gender, motherNumber, fatherNumber, fee } = stu;
 
+        // normalize batch age to integer
+        const parsedBatchAge = (age !== undefined && age !== null && age !== '') ? parseInt(age, 10) : undefined;
+
         // Validate required fields
         if (!fullname || !motherNumber || !fatherNumber) {
           errors.push(`Xogta ardayga "${fullname || "mid ka mid ah"}" waa ka maqan tahay`);
           continue;
         }
 
-        if (age && age < 0) {
+        if (parsedBatchAge !== undefined && (isNaN(parsedBatchAge) || parsedBatchAge < 0)) {
           errors.push(`Da'da ardayga "${fullname}" waa khaldan tahay`);
           continue;
         }
@@ -189,7 +201,7 @@ export const createMultipleStudents = async (req, res) => {
         const newStudent = await prisma.student.create({
           data: {
             fullname: fullname.trim(),
-            age: age || undefined,
+            age: parsedBatchAge === undefined ? null : parsedBatchAge,
             gender: gender || 'male',
             classId: classId,
             motherNumber: motherNumber.toString(),
@@ -270,14 +282,30 @@ export const getAllStudents = async (req , res) => {
 export const getStudentById = async (req, res) => {
   try {
     const { studentId } = req.params;
-    const student = await prisma.student.findUnique({
-      where: { id: studentId },
+
+    if (!studentId) {
+      return res.status(400).json({ message: "Student ID is required" });
+    }
+
+    const student = await prisma.student.findFirst({
+      where: {
+        OR: [
+          { id: studentId },
+          { studentId: studentId }
+        ]
+      },
       include: {
         examRecords: {
           orderBy: { date: 'desc' },
           include: {
             subject: {
-              select: { name: true, code: true, teacher: true }
+              select: {
+                id: true,
+                name: true,
+                code: true,
+                createdAt: true,
+                updatedAt: true
+              }
             },
             teacher: {
               select: { name: true }
@@ -333,7 +361,17 @@ export const updateStudent = async (req, res) => {
   try {
     const { studentId } = req.params;
     const { fullname, age, gender, motherNumber, fatherNumber } = req.body;
+
+    const parsedAge = (age !== undefined && age !== null && age !== '') ? parseInt(age, 10) : undefined;
     const newClassId = req.body.classId || req.body.class || null;
+
+    // if updating class, ensure the class exists to avoid FK errors
+    if (newClassId) {
+      const classExistsForUpdate = await prisma.class.findUnique({ where: { id: newClassId } });
+      if (!classExistsForUpdate) {
+        return res.status(400).json({ message: "Fasalka lama helin" });
+      }
+    }
 
     const prevStudent = await prisma.student.findUnique({
       where: { id: studentId },
@@ -341,16 +379,17 @@ export const updateStudent = async (req, res) => {
     });
     if (!prevStudent) return res.status(404).json({ message: "Arday lama helin" });
 
+    const updateData = {};
+    if (fullname !== undefined) updateData.fullname = fullname;
+    if (parsedAge !== undefined) updateData.age = parsedAge;
+    if (gender !== undefined) updateData.gender = gender;
+    if (newClassId !== undefined) updateData.classId = newClassId;
+    if (motherNumber !== undefined) updateData.motherNumber = motherNumber;
+    if (fatherNumber !== undefined) updateData.fatherNumber = fatherNumber;
+
     const updated = await prisma.student.update({
       where: { id: studentId },
-      data: {
-        fullname,
-        age,
-        gender,
-        classId: newClassId,
-        motherNumber,
-        fatherNumber
-      },
+      data: updateData,
       include: { class: true }
     });
 

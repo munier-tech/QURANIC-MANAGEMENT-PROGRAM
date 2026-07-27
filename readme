@@ -1,0 +1,302 @@
+# 📖 Quranic Management System
+
+A modern web-based **Quranic Management System** designed to help Quranic schools (Madrasas) efficiently manage students, teachers, classes, attendance, exams, fees, and administrative activities from a single platform.
+
+---
+
+## 📌 Project Overview
+
+The Quranic Management System is a full-stack web application built to digitize the daily operations of Quranic schools. It provides administrators and teachers with an easy-to-use interface for managing academic and financial records while improving efficiency and reducing paperwork.
+
+---
+
+## ✨ Features
+
+### 👤 Authentication
+- Secure Login
+- JWT Authentication
+- Role-Based Access Control
+- Protected Routes
+
+### 👨‍🎓 Student Management
+- Register Students
+- Update Student Information
+- Delete Students
+- Search Students
+- Student Profiles
+- Parent Contact Information
+- Class Assignment
+
+### 👨‍🏫 Teacher Management
+- Add Teachers
+- Update Teacher Details
+- Teacher Profiles
+- Assign Teachers to Classes
+
+### 🏫 Class Management
+- Create Classes
+- Assign Students
+- Assign Teachers
+- Manage Class Information
+
+### 📚 Subject Management
+- Create Subjects
+- Assign Subjects to Classes
+- View Subject Lists
+
+### ✅ Attendance Management
+- Record Daily Attendance
+- View Attendance History
+- Track Student Attendance
+
+### 📝 Examination Management
+- Create Exams
+- Record Student Marks
+- View Exam Results
+- Academic Year Management
+
+### 💰 Finance Management
+- Student Fee Management
+- Income Tracking
+- Expense Tracking
+- Financial Reports
+
+### 💵 Salary Management
+- Teacher Salary Records
+- Salary Payments
+- Payment History
+
+### 🏥 Health Records
+- Store Student Health Information
+- Medical Notes
+- Emergency Information
+
+### 📋 Discipline Reports
+- Record Student Behaviour
+- Manage Discipline Cases
+
+### 📊 Dashboard
+- Student Statistics
+- Teacher Statistics
+- Financial Summary
+- Attendance Overview
+
+---
+
+# 🛠️ Tech Stack
+
+## Frontend
+
+- React.js
+- Vite
+- Tailwind CSS
+- Zustand
+- Axios
+- React Router DOM
+- React Icons
+- Framer Motion
+- Recharts
+
+## Backend
+
+- Node.js
+- Express.js
+- PostgreSQL
+- Prisma ORM
+- JWT Authentication
+- bcrypt
+- Cookie Parser
+- CORS
+- Dotenv
+
+---
+
+# 📂 Project Structure
+
+```
+Quranic-Management-System/
+│
+├── client/
+│   ├── src/
+│   ├── public/
+│   └── package.json
+│
+├── server/
+│   ├── prisma/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── routes/
+│   ├── models/
+│   ├── utils/
+│   ├── config/
+│   └── package.json
+│
+└── README.md
+```
+
+---
+
+# 🚀 Installation
+
+## Clone Repository
+
+```bash
+git clone https://github.com/yourusername/quranic-management-system.git
+```
+
+## Navigate to Project
+
+```bash
+cd quranic-management-system
+```
+
+---
+
+## Install Backend Dependencies
+
+```bash
+cd server
+npm install
+```
+
+---
+
+## Install Frontend Dependencies
+
+```bash
+cd ../client
+npm install
+```
+
+---
+
+# ⚙️ Environment Variables
+
+Create a `.env` file inside the server folder.
+
+```env
+PORT=5000
+
+DATABASE_URL=your_database_url
+
+JWT_SECRET=your_secret_key
+
+NODE_ENV=development
+```
+
+---
+
+# 🗄️ Database
+
+Generate Prisma Client
+
+```bash
+npx prisma generate
+```
+
+Run Migrations
+
+```bash
+npx prisma migrate dev
+```
+
+Open Prisma Studio
+
+```bash
+npx prisma studio
+```
+
+---
+
+# ▶️ Run the Application
+
+Backend
+
+```bash
+npm run dev
+```
+
+Frontend
+
+```bash
+npm run dev
+```
+
+---
+
+# 📡 API Modules
+
+- Authentication
+- Students
+- Teachers
+- Classes
+- Subjects
+- Attendance
+- Exams
+- Finance
+- Salaries
+- Health Records
+- Discipline Reports
+
+---
+
+# 🔐 Authentication
+
+The application uses:
+
+- JWT Authentication
+- HTTP Only Cookies
+- Password Hashing (bcrypt)
+- Protected API Routes
+- Role-Based Authorization
+
+---
+
+# 📈 Future Improvements
+
+- Parent Portal
+- Student Portal
+- SMS Notifications
+- Email Notifications
+- Online Fee Payments
+- Certificate Generation
+- PDF Report Cards
+- Backup & Restore
+- Multi-language Support
+- Mobile Application
+
+---
+
+# 🤝 Contributing
+
+Contributions are welcome.
+
+1. Fork the repository.
+2. Create a feature branch.
+3. Commit your changes.
+4. Push to your branch.
+5. Open a Pull Request.
+
+---
+
+# 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+# 👨‍💻 Author
+
+**Munir Yusuf**
+
+Bachelor of Science in Software Engineering
+
+Gollis University
+
+Hargeisa, Somaliland
+
+---
+
+## ⭐ Support
+
+If you like this project, please consider giving it a ⭐ on GitHub.

@@ -20,7 +20,8 @@ export const createClass = async (req, res) => {
       data: { name, level }
     });
 
-    res.status(201).json({ message: "Fasal si guul leh ayaa loo abuuray", classData: newClass });
+    const payload = { ...newClass, _id: newClass.id };
+    res.status(201).json({ message: "Fasal si guul leh ayaa loo abuuray", classData: payload });
   } catch (error) {
     console.error("createClass error:", error);
     res.status(500).json({ message:  error.message });
@@ -36,7 +37,8 @@ export const getAllClasses = async (req, res) => {
         attendances: true
       }
     });
-    res.status(200).json({ classes });
+    const payload = classes.map(c => ({ ...c, _id: c.id }));
+    res.status(200).json({ classes: payload });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -55,7 +57,8 @@ export const getClassById = async (req, res) => {
       return res.status(404).json({ message: "Fasalka lama helin" });
     }
 
-    res.status(200).json({ classData });
+    const payload = { ...classData, _id: classData.id };
+    res.status(200).json({ classData: payload });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -72,7 +75,8 @@ export const updateClass = async (req, res) => {
       data: { name, level }
     });
 
-    res.status(200).json({ message: "Fasalka si guul leh ayaa loo cusbooneysiiyay", classData: updated });
+    const payload = { ...updated, _id: updated.id };
+    res.status(200).json({ message: "Fasalka si guul leh ayaa loo cusbooneysiiyay", classData: payload });
   } catch (error) {
     if (error.code === 'P2025') {
       return res.status(404).json({ message: "Fasalka lama helin" });

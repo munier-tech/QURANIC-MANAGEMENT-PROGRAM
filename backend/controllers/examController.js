@@ -164,10 +164,29 @@ export const createClassExam = async (req, res) => {
     }
 
     const academicYear = getAcademicYear(date);
+
+    const teacherRecord = await prisma.teacher.findFirst({
+      where: {
+        OR: [
+          { email: req.user?.email },
+          { name: req.user?.username }
+        ]
+      }
+    });
+
+    const teacherId = teacherRecord?.id || (await prisma.teacher.findFirst())?.id;
+
+    if (!teacherId) {
+      return res.status(400).json({
+        success: false,
+        message: "No teacher profile was found for the current user. Please create a teacher profile first."
+      });
+    }
+
     const examsToCreate = marksList.map(({ studentId, obtainedMarks }) => ({
       studentId,
       classId,
-      teacherId: req.user.id,
+      teacherId,
       subjectId,
       examType,
       date: new Date(date),

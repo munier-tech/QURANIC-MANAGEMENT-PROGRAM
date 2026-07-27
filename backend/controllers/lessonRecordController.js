@@ -9,19 +9,35 @@ export const createQuranRecord = async (req, res) => {
     });
     if (!classDoc) return res.status(404).json({ message: "Fasalka lama helin" });
 
+    // Map studentPerformances to connect students properly
+    const mappedPerformances = (studentPerformances || [])
+      .filter(perf => perf && (perf.student || perf.studentId))
+      .map(perf => ({
+        dailyLessonHint: perf.dailyLessonHint || "",
+        currentSurah: perf.currentSurah || "",
+        taxdiid: perf.taxdiid || "",
+        studentStatus: perf.studentStatus || "",
+        notes: perf.notes || "",
+        student: {
+          connect: {
+            id: perf.student || perf.studentId
+          }
+        }
+      }));
+
     const record = await prisma.lessonRecord.create({
       data: {
         type: "quran",
-        classId: classId,
-        quran: {
-          dailyLessonHint,
-          currentSurah,
-          taxdiid,
-          studentStatus,
-          notes,
+        class: {
+          connect: { id: classId }
         },
+        quranDailyLessonHint: dailyLessonHint,
+        quranCurrentSurah: currentSurah,
+        quranTaxdiid: taxdiid,
+        quranStudentStatus: studentStatus,
+        quranNotes: notes,
         studentPerformances: {
-          create: studentPerformances || []
+          create: mappedPerformances
         }
       },
       include: {
@@ -59,17 +75,33 @@ export const createSubcisRecord = async (req, res) => {
     });
     if (!halaqa) return res.status(404).json({ message: "Halaqa not found" });
 
+    // Map studentPerformances to connect students properly
+    const mappedPerformances = (studentPerformances || [])
+      .filter(perf => perf && (perf.student || perf.studentId))
+      .map(perf => ({
+        dailyLessonHint: perf.dailyLessonHint || "",
+        currentSurah: perf.currentSurah || "",
+        taxdiid: perf.taxdiid || "",
+        studentStatus: perf.studentStatus || "",
+        notes: perf.notes || "",
+        student: {
+          connect: {
+            id: perf.student || perf.studentId
+          }
+        }
+      }));
+
     const record = await prisma.lessonRecord.create({
       data: {
         type: "subcis",
-        halaqaId: halaqaId,
-        subci: {
-          startingSurah,
-          taxdiid,
-          notes,
+        halaqa: {
+          connect: { id: halaqaId }
         },
+        subciStartingSurah: startingSurah,
+        subciTaxdiid: taxdiid,
+        subciNotes: notes,
         studentPerformances: {
-          create: studentPerformances || []
+          create: mappedPerformances
         }
       },
       include: {
@@ -98,30 +130,32 @@ export const createSubcisRecord = async (req, res) => {
 export const updateRecord = async (req, res) => {
   try {
     const { id } = req.params;
-    const { quran, subci, studentPerformances } = req.body;
+    const { quaran, subci, studentPerformances, ...flatData } = req.body;
 
     const record = await prisma.lessonRecord.findUnique({
       where: { id }
     });
     if (!record) return res.status(404).json({ message: "Record not found" });
 
-    const updateData = {};
+    const updateData = { ...flatData };
 
-    if (quran && typeof quran === 'object') {
-      updateData.quran = {
-        ...record.quran,
-        ...quran
-      };
+    // Handle quran updates if provided
+    if (quaran && typeof quaran === 'object') {
+      updateData.quranDailyLessonHint = quaran.dailyLessonHint || record.quranDailyLessonHint;
+      updateData.quranCurrentSurah = quaran.currentSurah || record.quranCurrentSurah;
+      updateData.quranTaxdiid = quaran.taxdiid || record.quranTaxdiid;
+      updateData.quranStudentStatus = quaran.studentStatus || record.quranStudentStatus;
+      updateData.quranNotes = quaran.notes || record.quranNotes;
     }
+    // Handle subci updates if provided
     if (subci && typeof subci === 'object') {
-      updateData.subci = {
-        ...record.subci,
-        ...subci
-      };
+      updateData.subciStartingSurah = subci.startingSurah || record.subciStartingSurah;
+      updateData.subciTaxdiid = subci.taxdiid || record.subciTaxdiid;
+      updateData.subciNotes = subci.notes || record.subciNotes;
     }
     if (Array.isArray(studentPerformances)) {
       // Delete existing performances and create new ones
-      await prisma.studentPerformance.deleteMany({
+      await prisma.lessonRecordStudentPerformance.deleteMany({
         where: { lessonRecordId: id }
       });
       updateData.studentPerformances = {
