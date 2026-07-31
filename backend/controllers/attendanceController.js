@@ -16,16 +16,25 @@ export const createAttendance = async (req, res) => {
       return res.status(404).json({ message: "Fasalka lama helin" });
     }
 
-    for (const s of students) {
+    const normalizedStudents = students.map((s) => ({
+      studentId: s.student || s.studentId,
+      status: s.status
+    }));
+
+    for (const s of normalizedStudents) {
+      if (!s.studentId) {
+        return res.status(400).json({ message: "Mid kasta oo ardayga ah waa inuu leeyahay student ama studentId" });
+      }
+
       const foundStudent = await prisma.student.findUnique({
-        where: { id: s.student }
+        where: { id: s.studentId }
       });
       if (!foundStudent) {
-        return res.status(404).json({ message: `Ardayga leh ID-ga ${s.student} lama helin` });
+        return res.status(404).json({ message: `Ardayga leh ID-ga ${s.studentId} lama helin` });
       }
 
       if (!["present", "absent", "late"].includes(s.status)) {
-        return res.status(400).json({ message: `Xaalad khaldan ayaa loo qoray ardayga ${s.student}` });
+        return res.status(400).json({ message: `Xaalad khaldan ayaa loo qoray ardayga ${s.studentId}` });
       }
     }
 
@@ -34,7 +43,12 @@ export const createAttendance = async (req, res) => {
         classId: classId,
         date: new Date(date),
         students: {
-          create: students
+          create: normalizedStudents.map((s) => ({
+            student: {
+              connect: { id: s.studentId }
+            },
+            status: s.status
+          }))
         }
       },
       include: {
@@ -106,13 +120,35 @@ export const updateAttendance = async (req, res) => {
     const updateData = {};
     if (date) updateData.date = new Date(date);
     if (students && Array.isArray(students)) {
-      // First delete existing student records
+      const normalizedStudents = students.map((s) => ({
+        studentId: s.student || s.studentId,
+        status: s.status
+      }));
+
+      for (const s of normalizedStudents) {
+        if (!s.studentId) {
+          return res.status(400).json({ message: "Mid kasta oo ardayga ah waa inuu leeyahay student ama studentId" });
+        }
+
+        const foundStudent = await prisma.student.findUnique({
+          where: { id: s.studentId }
+        });
+        if (!foundStudent) {
+          return res.status(404).json({ message: `Ardayga leh ID-ga ${s.studentId} lama helin` });
+        }
+      }
+
       await prisma.attendanceStudent.deleteMany({
         where: { attendanceId: attendanceId }
       });
-      // Then create new ones
+
       updateData.students = {
-        create: students
+        create: normalizedStudents.map((s) => ({
+          student: {
+            connect: { id: s.studentId }
+          },
+          status: s.status
+        }))
       };
     }
 

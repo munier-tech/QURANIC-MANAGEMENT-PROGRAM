@@ -100,7 +100,7 @@ export const getAttendance = async (req, res) => {
             id: true,
             name: true,
             email: true,
-            phone: true
+            number: true
           }
         },
         recordedBy: {
@@ -110,7 +110,7 @@ export const getAttendance = async (req, res) => {
           }
         }
       },
-      orderBy: { date: 'desc' } // Newest first
+      orderBy: { date: 'desc' }
     });
 
     res.status(200).json({
@@ -164,7 +164,7 @@ export const getTeachersAttendanceByDate = async (req, res) => {
             id: true,
             name: true,
             email: true,
-            phone: true
+            number: true
           }
         },
         recordedBy: {
