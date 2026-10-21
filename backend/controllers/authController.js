@@ -8,7 +8,7 @@ export const SignUp = async (req, res) => {
     const { username, password, email, profilePicture, role } = req.body;
 
     if (!username || !password || !email || !role) {
-      return res.status(400).json({ message: "Fadlan buuxi dhammaan meelaha looga baahan yahay in la buuxiyo" });
+      return res.status(400).json({ message: "Fadlan buuxi dhammaan meelaha looga baahan yahay in" });
     }
 
     const normalizedEmail = email?.trim().toLowerCase();
