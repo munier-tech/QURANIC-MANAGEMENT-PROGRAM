@@ -5,7 +5,7 @@ A comprehensive school management system built with the MERN stack (MongoDB, Exp
 ## Features
 
 ### Backend (Completed)
-- ✅ **Authentication System**: JWT-based authentication1 with role-based access control
+- ✅ **Authentication System**: JWT-based authentication with role-based access control
 - ✅ **Student Management**: CRUD operations, fee tracking, class assignment
 - ✅ **Teacher Management**: Complete teacher profile management
 - ✅ **Class Management**: Class creation, teacher assignment, student enrollment
