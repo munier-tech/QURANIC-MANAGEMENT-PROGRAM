@@ -6,7 +6,7 @@ export const createAttendance = async (req, res) => {
     const { classId, date, students } = req.body;
 
     if (!classId || !date || !students || !Array.isArray(students) || students.length === 0) {
-      return res.status(400).json({ message: "Fadlan buuxi dhammaan xogaha halkan so socda: classId, date, iyo students[]" });
+      return res.status(400).json({ message: "Fadan buuxi dhammaan xogaha halkan so socda: classId, date, iyo students[]" });
     }
 
     const foundClass = await prisma.class.findUnique({
